@@ -9,20 +9,40 @@
   ],
   "school_data": {
     "Derslerim": [
-      "Hayat Bilgisi",
-      "Matematik",
-      "Fen Bilimleri",
-      "Türkçe"
+      {
+        "title": "Matematik",
+        "time": "10:00 - 10:40",
+        "description": "Sayılar, işlemler ve problem çözme yeteneklerini geliştirir.",
+        "content": "Çarpım Tablosu, Bölme İşlemi, Kesirler",
+        "weekly_hours": "5 Saat",
+        "note": "Yanında mutlaka kareli defter bulundur."
+      },
+      {
+        "title": "Türkçe",
+        "time": "13:00 - 13:40",
+        "description": "Okuma, yazma ve dil bilgisi becerilerini kapsar.",
+        "content": "Okuma Anlama, Yazım Kuralları, Noktalama İşaretleri",
+        "weekly_hours": "4 Saat",
+        "note": "Okuma kitabını getirmeyi unutma."
+      },
+      {
+        "title": "Fen Bilimleri",
+        "time": "11:00 - 11:40",
+        "description": "Doğa olaylarını ve bilimsel deneyleri keşfeder.",
+        "content": "Bitki Deneyi, Madde ve Isı, Canlılar Dünyası",
+        "weekly_hours": "3 Saat",
+        "note": "Deney tüplerini temiz getirmeyi unutma."
+      }
     ],
     "Ders Programı": [
-      "Pazartesi: Matematik",
-      "Salı: Türkçe"
+      "Pazartesi: Matematik, Hayat Bilgisi",
+      "Salı: Türkçe, Fen Bilimleri"
     ],
     "Öğretmenim": [
-      "Ali Yılmaz"
+      "Ali Yılmaz - Sınıf Öğretmeni"
     ],
     "Ödevler": [
-      "Matematik Sayfa 20"
+      "Matematik: Sayfa 20 çözülecek."
     ]
   }
 }

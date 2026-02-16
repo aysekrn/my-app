@@ -6,50 +6,59 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty, pyqtSlot
 LESSONS_PATH = files("my_app").joinpath("data/lessons.json")
 
 class AppControl(QObject):
-    # QML tarafını uyarmak için kullanılan sinyaller
+    # Veri değişimlerini QML'e bildiren sinyaller
     categories_changed = pyqtSignal()
     current_list_changed = pyqtSignal()
+    detail_changed = pyqtSignal()
 
     def __init__(self):
         super().__init__()
-        self._raw_data = {}         # Tüm JSON verisi burada tutulur
-        self._current_category = ""  # Seçili olan kategori (Derslerim vb.)
+        self._raw_data = {}          # Tüm okul verisi
+        self._current_category = ""   # Seçilen ana kategori (Örn: Derslerim)
+        self._current_detail = {}     # Seçilen dersin detayları (Örn: Matematik saati)
         self.load_data()
 
     def load_data(self):
-        """JSON dosyasını okur ve school_data kısmını yükler."""
+        """JSON dosyasını okur ve school_data kısmını belleğe alır."""
         try:
-            # Dosyayı UTF-8 formatında açıyoruz
             with open(LESSONS_PATH, "r", encoding="utf-8") as f:
                 full_data = json.load(f)
-                # Sadece senin istediğin okul kategorilerini alıyoruz
                 self._raw_data = full_data.get("school_data", {})
-            
             self.categories_changed.emit()
-            print("Veri başarıyla yüklendi.")
         except Exception as e:
-            print(f"JSON okuma hatası: {e}")
+            print(f"Veri yükleme hatası: {e}")
 
-    # --- QML TARAFINDAN ERİŞİLEBİLEN ÖZELLİKLER (PROPERTIES) ---
+    # --- QML PROPERTIES (Veri Okuma) ---
 
     @pyqtProperty(list, notify=categories_changed)
     def categories(self):
-        """Sol menü veya ana butonlar için kategori isimlerini döndürür."""
-        # ["Derslerim", "Ders Programı", "Öğretmenim", "Ödevler"]
+        """Ana menüdeki buton isimlerini (Key'leri) döndürür."""
         return list(self._raw_data.keys())
 
     @pyqtProperty(list, notify=current_list_changed)
     def currentItems(self):
-        """Seçilen kategoriye ait alt listeyi döndürür."""
-        # Örneğin "Derslerim" seçiliyse: ["Matematik", "Türkçe" ...]
+        """Seçilen kategorinin içeriğini döndürür."""
         return self._raw_data.get(self._current_category, [])
 
-    # --- QML TARAFINDAN ÇAĞRILAN FONKSİYONLAR (SLOTS) ---
+    @pyqtProperty("QVariantMap", notify=detail_changed)
+    def currentDetail(self):
+        """Seçilen dersin detay bilgilerini (saat, not) döndürür."""
+        return self._current_detail
+
+    # --- QML SLOTS (İşlem Yapma) ---
 
     @pyqtSlot(str)
     def selectCategory(self, category_name):
-        """Kullanıcı bir butona bastığında hangi listenin açılacağını belirler."""
+        """Kullanıcı ana menüden bir kategori seçtiğinde çalışır."""
         self._current_category = category_name
-        # Sağ taraftaki veya Popup içindeki listenin yenilenmesini sağlar
         self.current_list_changed.emit()
-        print(f"Seçilen kategori: {category_name}")
+
+    @pyqtSlot(int)
+    def selectDetail(self, index):
+        """Listedeki spesifik bir ders tıklandığında detaylarını hazırlar."""
+        items = self._raw_data.get(self._current_category, [])
+        # Eğer öğe bir sözlükse (detay içeriyorsa) seç
+        if index < len(items) and isinstance(items[index], dict):
+            self._current_detail = items[index]
+            self.detail_changed.emit()
+            print(f"Detay seçildi: {self._current_detail.get('title')}")

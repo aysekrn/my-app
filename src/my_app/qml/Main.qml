@@ -3,148 +3,90 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 ApplicationWindow {
+    id: window
     visible: true
     width: 800
     height: 800
-    title: "Okul Sistemi"
+    title: "Okul Yönetim Sistemi"
 
-    // Arka Plan
-    Rectangle {
+    // Sadeleştirilmiş StackView: Çakışmaları önlemek için sadece anchors.fill kullanıldı
+    StackView {
+        id: stackView
         anchors.fill: parent
-        color: "#f4f7f6"
+        initialItem: mainPage
     }
 
-    // 1. SOL ÜST İKON BÖLÜMÜ
-    Image {
-        id: appLogo
-        source: "file:icon.png" // Ana dizindeki icon.png dosyasını okur
-        width: 60
-        height: 60
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.margins: 20
-        fillMode: Image.PreserveAspectFit
-        
-        // İkonun altına küçük bir etiket (isteğe bağlı)
-        Text {
-            anchors.top: parent.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
-            
-            font.pixelSize: 12
-            color: "#7f8c8d"
-        }
-    }
-
-    // 2. ORTA MENÜ (Butonlar)
-    ColumnLayout {
-        anchors.centerIn: parent
-        width: parent.width * 0.7
-        spacing: 15
-
-        Text {
-            text: "OKUL YÖNETİMİ"
-            font.pixelSize: 30
-            font.bold: true
-            Layout.alignment: Qt.AlignHCenter
-            color: "#2c3e50"
-            Layout.bottomMargin: 10
-        }
-
-        Repeater {
-            model: appControl.categories // Python'daki sözlük anahtarlarını çeker
-            delegate: Button {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 65
-                
-                contentItem: Text {
-                    text: modelData
-                    font.pixelSize: 20
-                    font.weight: Font.Medium
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    color: "white"
-                }
-
-                background: Rectangle {
-                    color: parent.down ? "#2ecc71" : "#27ae60" // Yeşil tonları okul temasına uygundur
-                    radius: 12
-                    border.color: "#219150"
-                    border.width: 1
-                }
-
-                onClicked: {
-                    appControl.selectCategory(modelData) // Seçilen kategoriyi Python'a bildirir
-                    detailPopup.title = modelData
-                    detailPopup.open()
-                }
-            }
-        }
-    }
-
-    // 3. İÇERİK POPUP (Pencere)
-    Popup {
-        id: detailPopup
-        property string title: ""
-        width: parent.width * 0.85
-        height: parent.height * 0.6
-        anchors.centerIn: parent
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-        background: Rectangle {
-            radius: 15
-            color: "white"
-            border.color: "#bdc3c7"
-        }
-
-        ColumnLayout {
+    // --- ANA SAYFA BİLEŞENİ ---
+    Component {
+        id: mainPage
+        Item {
             anchors.fill: parent
-            anchors.margins: 25
-
-            Text {
-                text: detailPopup.title
-                font.pixelSize: 24
-                font.bold: true
-                color: "#2c3e50"
-                Layout.alignment: Qt.AlignHCenter
-            }
 
             Rectangle {
-                Layout.fillWidth: true
-                height: 2
-                color: "#ecf0f1"
+                anchors.fill: parent
+                color: "#f8f9fa"
             }
 
-            ListView {
-                id: listView
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                clip: true
-                model: appControl.currentItems // Seçilen kategoriye ait listeyi gösterir
-                spacing: 8
-                
-                delegate: Rectangle {
-                    width: listView.width
-                    height: 50
-                    color: "#f8f9fa"
-                    radius: 8
-                    border.color: "#e9ecef"
+            // Sol Üst İkon
+            Image {
+                source: "file:icon.png"
+                width: 60
+                height: 60
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.margins: 20
+                fillMode: Image.PreserveAspectFit
+            }
+
+            ColumnLayout {
+                anchors.centerIn: parent
+                width: parent.width * 0.7
+                spacing: 20
+
+                Text {
+                    text: "OKUL SİSTEMİ"
+                    font.pixelSize: 32
+                    font.bold: true
+                    Layout.alignment: Qt.AlignHCenter
+                    color: "#2c3e50"
+                }
+
+                Repeater {
+                    // Güvenlik Kontrolü: appControl yüklenmeden veri okunmasını engeller
+                    model: appControl ? appControl.categories : [] 
                     
-                    Text {
-                        anchors.centerIn: parent
-                        text: modelData
-                        font.pixelSize: 18
-                        color: "#34495e"
+                    delegate: Button {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 70
+                        
+                        contentItem: Text {
+                            text: modelData
+                            font.pixelSize: 22
+                            font.bold: true
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            color: "white"
+                        }
+
+                        background: Rectangle {
+                            color: parent.down ? "#2980b9" : "#3498db"
+                            radius: 12
+                        }
+
+                        onClicked: {
+                            appControl.selectCategory(modelData)
+                            stackView.push("pages/SubItemsPage.qml", { "categoryTitle": modelData })
+                        }
                     }
                 }
             }
+        }
+    }
 
-            Button {
-                text: "Geri Dön"
-                Layout.alignment: Qt.AlignHCenter
-                onClicked: detailPopup.close()
-            }
+    Connections {
+        target: appControl
+        function onCurrent_list_changed() {
+            console.log("Navigasyon hazır, liste güncellendi.")
         }
     }
 }
