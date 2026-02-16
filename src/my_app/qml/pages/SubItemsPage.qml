@@ -4,14 +4,14 @@ import QtQuick.Layouts 1.15
 
 Item {
     id: subPage
-    property string categoryTitle: ""
+    property string categoryTitle: "" // Main.qml'den gelen başlık bilgisi
 
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 20
         spacing: 20
 
-        // ÜST BAR: Geri butonu ve tam ortalanmış başlık
+        // ÜST BAR: Geri butonu ve Başlık
         Item {
             Layout.fillWidth: true
             implicitHeight: 60
@@ -20,7 +20,7 @@ Item {
                 text: "‹ Geri"
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                onClicked: stackView.pop() // Bir önceki sayfaya döner
+                onClicked: stackView.pop() // Önceki sayfaya dön
                 
                 background: Rectangle {
                     implicitWidth: 80
@@ -35,13 +35,11 @@ Item {
                 font.pixelSize: 28
                 font.bold: true
                 color: "#2c3e50"
-                // Başlığı butondan bağımsız olarak tam yatay merkeze sabitler
-                anchors.horizontalCenter: parent.horizontalCenter 
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.centerIn: parent // Başlığı tam ortaya hizalar
             }
         }
 
-        // Ayırıcı ince çizgi
+        // İnce Ayırıcı Çizgi
         Rectangle {
             Layout.fillWidth: true
             height: 1
@@ -53,7 +51,7 @@ Item {
             id: listView
             Layout.fillWidth: true
             Layout.fillHeight: true
-            model: appControl.currentItems // Python'dan gelen kategorik listeyi kullanır
+            model: appControl.currentItems
             spacing: 12
             clip: true
 
@@ -66,7 +64,7 @@ Item {
 
                 Text {
                     anchors.centerIn: parent
-                    // Eğer veri bir nesneyse (ders detayı) title'ı gösterir, değilse metni gösterir
+                    // Veri nesne ise başlığını, değilse kendisini yaz
                     text: typeof modelData === "object" ? modelData.title : modelData
                     font.pixelSize: 20
                     font.weight: Font.Medium
@@ -76,12 +74,13 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        // Eğer tıklanan öğe bir nesne ise (ders detayı içeriyorsa)
                         if (typeof modelData === "object") {
-                            appControl.selectDetail(index) // Python tarafında detay verisini hazırlar
-                            stackView.push("DetailPage.qml") // Detay sayfasına geçiş yapar
-                        } else {
-                            console.log("Bu öğe detay içermiyor:", modelData)
+                            appControl.selectDetail(index)
+                            
+                            // 🚀 KRİTİK DÜZELTME BURADA:
+                            // Detay sayfasına geçerken "Hangi kategorideyiz?" bilgisini de gönderiyoruz.
+                            // Böylece detay sayfası "Öğretmen" mi "Ders" mi olduğunu anlayabiliyor.
+                            stackView.push("DetailPage.qml", { "categoryTitle": categoryTitle })
                         }
                     }
                 }

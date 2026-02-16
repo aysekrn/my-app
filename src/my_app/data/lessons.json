@@ -39,7 +39,11 @@
       "Salı: Türkçe, Fen Bilimleri"
     ],
     "Öğretmenim": [
-      "Ali Yılmaz - Sınıf Öğretmeni"
+      {
+    "title": "Selin Yılmaz",
+    "description": "Sınıf Öğretmeni - 20 yıllık deneyim.",
+    "note": "Hafta içi 15:00'den sonra görüşebiliriz."
+  }
     ],
     "Ödevler": [
       "Matematik: Sayfa 20 çözülecek."

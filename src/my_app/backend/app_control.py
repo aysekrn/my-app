@@ -1,9 +1,12 @@
-from importlib.resources import files
 import json
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty, pyqtSlot
+from importlib.resources import files
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty, pyqtSlot, QUrl
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 
-# JSON dosyasının yolu
+# JSON ve Ses dosyası yolları
 LESSONS_PATH = files("my_app").joinpath("data/lessons.json")
+# Ses dosyasının tam yolunu buraya tanımlıyoruz
+VOICE_PATH = files("my_app").joinpath("data/welcome.mp3")
 
 class AppControl(QObject):
     # Veri değişimlerini QML'e bildiren sinyaller
@@ -14,8 +17,11 @@ class AppControl(QObject):
     def __init__(self):
         super().__init__()
         self._raw_data = {}          # Tüm okul verisi
-        self._current_category = ""   # Seçilen ana kategori (Örn: Derslerim)
-        self._current_detail = {}     # Seçilen dersin detayları (Örn: Matematik saati)
+        self._current_category = ""   # Seçilen ana kategori
+        self._current_detail = {}     # Seçilen dersin detayları
+        
+        # Ses oynatıcıyı başlatıyoruz
+        self.player = QMediaPlayer()
         self.load_data()
 
     def load_data(self):
@@ -32,33 +38,38 @@ class AppControl(QObject):
 
     @pyqtProperty(list, notify=categories_changed)
     def categories(self):
-        """Ana menüdeki buton isimlerini (Key'leri) döndürür."""
         return list(self._raw_data.keys())
 
     @pyqtProperty(list, notify=current_list_changed)
     def currentItems(self):
-        """Seçilen kategorinin içeriğini döndürür."""
         return self._raw_data.get(self._current_category, [])
 
     @pyqtProperty("QVariantMap", notify=detail_changed)
     def currentDetail(self):
-        """Seçilen dersin detay bilgilerini (saat, not) döndürür."""
         return self._current_detail
 
     # --- QML SLOTS (İşlem Yapma) ---
 
     @pyqtSlot(str)
     def selectCategory(self, category_name):
-        """Kullanıcı ana menüden bir kategori seçtiğinde çalışır."""
         self._current_category = category_name
         self.current_list_changed.emit()
 
     @pyqtSlot(int)
     def selectDetail(self, index):
-        """Listedeki spesifik bir ders tıklandığında detaylarını hazırlar."""
         items = self._raw_data.get(self._current_category, [])
-        # Eğer öğe bir sözlükse (detay içeriyorsa) seç
         if index < len(items) and isinstance(items[index], dict):
             self._current_detail = items[index]
             self.detail_changed.emit()
-            print(f"Detay seçildi: {self._current_detail.get('title')}")
+
+    @pyqtSlot()
+    def playTeacherVoice(self):
+        """Öğretmen sayfasındaki sabit MP3 dosyasını çalar."""
+        try:
+            # VOICE_PATH'i QUrl formatına çevirip çalıyoruz
+            url = QUrl.fromLocalFile(str(VOICE_PATH))
+            self.player.setMedia(QMediaContent(url))
+            self.player.play()
+            print("Ses çalınıyor...")
+        except Exception as e:
+            print(f"Ses çalma hatası: {e}")
