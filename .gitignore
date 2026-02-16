@@ -1,0 +1,12 @@
+venv/
+build/
+deb_dist/
+dist/
+*tar.gz
+.vscode/
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+src/*.egg-info

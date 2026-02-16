@@ -1,0 +1,28 @@
+{
+  "lessons": [
+    {
+      "id": 1,
+      "title": "Introduction to Programming",
+      "description": "Learn the basics of programming with Python.",
+      "duration": "4 hours"
+    }
+  ],
+  "school_data": {
+    "Derslerim": [
+      "Hayat Bilgisi",
+      "Matematik",
+      "Fen Bilimleri",
+      "Türkçe"
+    ],
+    "Ders Programı": [
+      "Pazartesi: Matematik",
+      "Salı: Türkçe"
+    ],
+    "Öğretmenim": [
+      "Ali Yılmaz"
+    ],
+    "Ödevler": [
+      "Matematik Sayfa 20"
+    ]
+  }
+}

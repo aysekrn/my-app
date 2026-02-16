@@ -1,0 +1,11 @@
+{
+    "name": "my-app",
+    "source": "python3-my-app",
+    "title": "Orbit Store",
+    "category": "tools",
+    "author": "Kalebu",
+    "email": "nkalebu@nctrobotic.com",
+    "age_rating": "null",
+    "exec": "/usr/bin/my-app",
+    "description": "Orbit App Store"
+}
