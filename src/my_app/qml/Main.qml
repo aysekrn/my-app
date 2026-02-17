@@ -8,69 +8,86 @@ ApplicationWindow {
     width: 800
     height: 800
     title: "Okul Yönetim Sistemi"
+    
+    // DÜZELTME 1: Arka planı tamamen beyaz yaptık (f8f9fa yerine)
+    color: "white" 
 
-    // Sadeleştirilmiş StackView: Çakışmaları önlemek için sadece anchors.fill kullanıldı
+    // --- 1. SABİT ÜST BAR (SADECE LOGO) ---
+    Rectangle {
+        id: topBar
+        width: parent.width
+        height: 80 
+        // DÜZELTME 2: Bar rengi de beyaz, böylece pencere ile birleşiyor
+        color: "white" 
+        z: 100 
+        
+        // DÜZELTME 3: Buradaki "Alt Çizgi" (Rectangle) kodunu SİLDİM.
+        // Artık arada kesici bir çizgi yok.
+
+        // SOL ÜSTTEKİ LOGO
+        Image {
+            source: "file:icon.png"
+            height: 60 // Logo biraz daha belirgin olsun
+            width: 60
+            anchors.left: parent.left
+            anchors.leftMargin: 25
+            anchors.verticalCenter: parent.verticalCenter
+            fillMode: Image.PreserveAspectFit
+        }
+    }
+
+    // --- 2. SAYFA YÖNETİCİSİ ---
     StackView {
         id: stackView
-        anchors.fill: parent
+        // Logo barının hemen altından başlar ama renk aynı olduğu için bütün görünür
+        anchors.top: topBar.bottom 
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
         initialItem: mainPage
     }
 
-    // --- ANA SAYFA BİLEŞENİ ---
+    // --- 3. ANA SAYFA İÇERİĞİ ---
     Component {
         id: mainPage
         Item {
-            anchors.fill: parent
-
-            Rectangle {
-                anchors.fill: parent
-                color: "#f8f9fa"
-            }
-
-            // Sol Üst İkon
-            Image {
-                source: "file:icon.png"
-                width: 60
-                height: 60
-                anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.margins: 20
-                fillMode: Image.PreserveAspectFit
-            }
-
+            // Ana sayfa içeriği
             ColumnLayout {
                 anchors.centerIn: parent
-                width: parent.width * 0.7
-                spacing: 20
+                width: parent.width * 0.6
+                spacing: 40
 
+                // BAŞLIK
                 Text {
                     text: "OKUL SİSTEMİ"
-                    font.pixelSize: 32
+                    font.pixelSize: 42
                     font.bold: true
-                    Layout.alignment: Qt.AlignHCenter
                     color: "#2c3e50"
+                    Layout.alignment: Qt.AlignHCenter
                 }
 
+                // BUTONLAR
                 Repeater {
-                    // Güvenlik Kontrolü: appControl yüklenmeden veri okunmasını engeller
-                    model: appControl ? appControl.categories : [] 
+                    model: appControl ? appControl.categories : []
                     
                     delegate: Button {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 70
+                        Layout.preferredHeight: 80
                         
                         contentItem: Text {
                             text: modelData
-                            font.pixelSize: 22
+                            font.pixelSize: 24
                             font.bold: true
+                            color: "white"
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
-                            color: "white"
                         }
 
                         background: Rectangle {
                             color: parent.down ? "#2980b9" : "#3498db"
-                            radius: 12
+                            radius: 15
+                            // Butonlara hafif gölge ekleyerek beyaz zemin üzerinde öne çıkardık
+                            layer.enabled: true
                         }
 
                         onClicked: {
@@ -80,13 +97,6 @@ ApplicationWindow {
                     }
                 }
             }
-        }
-    }
-
-    Connections {
-        target: appControl
-        function onCurrent_list_changed() {
-            console.log("Navigasyon hazır, liste güncellendi.")
         }
     }
 }

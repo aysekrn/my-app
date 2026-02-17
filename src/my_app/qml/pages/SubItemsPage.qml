@@ -4,14 +4,22 @@ import QtQuick.Layouts 1.15
 
 Item {
     id: subPage
-    property string categoryTitle: "" // Main.qml'den gelen başlık bilgisi
+    // Main.qml'den gelen başlık bilgisini (Örn: "Derslerim") tutar
+    property string categoryTitle: ""
+
+    // 1. DÜZELTME: Arka plan BEYAZ yapıldı.
+    // Böylece Main.qml'deki üst bar ile kusursuz birleşir.
+    Rectangle {
+        anchors.fill: parent
+        color: "white"
+    }
 
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 20
         spacing: 20
 
-        // ÜST BAR: Geri butonu ve Başlık
+        // --- ÜST BAR (Geri Butonu ve Başlık) ---
         Item {
             Layout.fillWidth: true
             implicitHeight: 60
@@ -20,13 +28,13 @@ Item {
                 text: "‹ Geri"
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                onClicked: stackView.pop() // Önceki sayfaya dön
+                onClicked: stackView.pop() // Bir önceki sayfaya dön
                 
                 background: Rectangle {
-                    implicitWidth: 80
-                    implicitHeight: 40
-                    color: parent.down ? "#d0d0d0" : "#e0e0e0"
+                    implicitWidth: 80; implicitHeight: 40
+                    color: parent.down ? "#e0e0e0" : "#f5f5f5" // Beyaz fonda belli olması için çok açık gri
                     radius: 8
+                    border.color: "#e0e0e0" // Hafif çerçeve
                 }
             }
 
@@ -39,14 +47,14 @@ Item {
             }
         }
 
-        // İnce Ayırıcı Çizgi
+        // İnce Ayırıcı Çizgi (Çok silik gri, estetik durur)
         Rectangle {
             Layout.fillWidth: true
             height: 1
-            color: "#eeeeee"
+            color: "#f0f0f0"
         }
 
-        // İÇERİK LİSTESİ
+        // --- LİSTE (Dersler veya İsimler) ---
         ListView {
             id: listView
             Layout.fillWidth: true
@@ -58,13 +66,14 @@ Item {
             delegate: Rectangle {
                 width: listView.width
                 height: 60
-                color: "#e3f2fd"
+                // Beyaz zemin üzerinde kaybolmaması için çok açık mavi tonu
+                color: "#f8fbff" 
                 radius: 12
-                border.color: "#bbdefb"
+                border.color: "#e3f2fd" // İnce mavi çerçeve
 
                 Text {
                     anchors.centerIn: parent
-                    // Veri nesne ise başlığını, değilse kendisini yaz
+                    // Veri nesne ise başlığını (Title), değilse kendisini yaz
                     text: typeof modelData === "object" ? modelData.title : modelData
                     font.pixelSize: 20
                     font.weight: Font.Medium
@@ -77,9 +86,9 @@ Item {
                         if (typeof modelData === "object") {
                             appControl.selectDetail(index)
                             
-                            // 🚀 KRİTİK DÜZELTME BURADA:
+                            // 🚀 KRİTİK NOKTA:
                             // Detay sayfasına geçerken "Hangi kategorideyiz?" bilgisini de gönderiyoruz.
-                            // Böylece detay sayfası "Öğretmen" mi "Ders" mi olduğunu anlayabiliyor.
+                            // Bu sayede detay sayfası "Öğretmen" mi "Ders" mi olduğunu anlıyor.
                             stackView.push("DetailPage.qml", { "categoryTitle": categoryTitle })
                         }
                     }
